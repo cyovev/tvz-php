@@ -1,0 +1,105 @@
+html, body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    background: url('../images/background-pattern.png') fixed #0c0e23;
+}
+header .hero-image {
+    height: 200px;
+    width: 1024px;
+    background: url('../images/nbu_logo_white.svg') #161660 no-repeat 50% 50%;
+    background-size: 55%;
+    margin: 0px auto;
+}
+header nav {
+    background: linear-gradient(#8f8f8f,#3C3C3C);
+    width: 100%;
+}
+header nav .nav-toggler-wrapper {
+    display: none;
+    cursor: pointer;
+}
+header nav ul {
+    list-style-type: none;
+    margin: 0 auto;
+    padding: 0;
+    width: 1024px;
+    font-size: 0; /* remove white spaces between li elements */
+}
+header nav ul li {
+    display: inline-block;
+}
+header nav ul li a {
+    display: block;
+    line-height: 45px;
+    padding: 0px 15px;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: #d2d2d2;
+    font-size: 13px;
+}
+header nav ul li a:hover, header nav ul li a.active {
+    color: white;
+    text-shadow: #000000 1px 1px 2px;
+    background-color: #a4a4a4;
+    transition: all 0.3s;
+}
+
+@media screen and (max-width: 1024px) {
+    header .hero-image, header nav ul {
+        width: 100%;
+    }
+    header .hero-image {
+        height: 120px;
+        background-size: 65%;
+    }
+    header nav ul {
+        display: none;
+    }
+    header nav ul li {
+        display: block;
+    }
+    header nav .nav-toggler-wrapper {
+        display: block;
+        position: absolute;
+        right: 20px;
+        top: 40px;
+    }
+    header nav #nav-toggler {
+        position: relative;
+        display: inline-block;
+        width: 1.25em;
+        height: 0.8em;
+        margin-right: 0.3em;
+        border-top: 0.2em solid white;
+        border-bottom: 0.2em solid white;
+        font-size: 20px;
+    }
+    header nav #nav-toggler.active {
+        border: none;
+    }
+    header nav #nav-toggler:before, header nav #nav-toggler:after {
+        transition: all 0.3s;
+    }
+    header nav #nav-toggler:before {
+        content: "";
+        position: absolute;
+        top: 0.3em;
+        left: 0px;
+        width: 100%;
+        border-top: 0.2em solid white;
+    }
+    header nav #nav-toggler.active:before {
+        transform: rotate(45deg);
+    }
+    header nav #nav-toggler.active:after {
+        content: "";
+        position: absolute;
+        bottom: 0.3em;
+        left: 0px;
+        width: 100%;
+        border-top: 0.2em solid white;
+        transform: rotate(-45deg);
+        transition: all 0.3s;
+    }
+}
