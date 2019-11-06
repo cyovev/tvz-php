@@ -116,10 +116,43 @@ footer img {
 footer a:hover img {
     transform: rotate(360deg);
 }
+.news-section {
+    margin-bottom: 2em;
+    padding-bottom: 1em;
+    border-bottom: 1px dotted #aaaaaa;
+}
+.news-section img {
+    opacity: 0.7;
+    border-radius: 5px;
+    height: 100px;
+    float: left;
+    margin-right: 1em;
+}
+.news-section a:hover img {
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+.news-section h2 {
+    margin: 0;
+}
+.news-section .date {
+    font-style: italic;
+    font-size: 14px;
+}
+.news-section .date + a {
+    font-style: italic;
+    float: right;
+    font-size: 14px;
+}
 
 @media screen and (max-width: 1024px) {
     section.section {
         width: 100%;
+    }
+    header {
+        position: fixed;
+        width: 100%;
+        z-index: 1;
     }
     header .hero-image {
         height: 90px;
@@ -135,7 +168,7 @@ footer a:hover img {
     }
     header nav .nav-toggler-wrapper {
         display: block;
-        position: fixed;
+        position: absolute;
         right: 20px;
         top: 30px;
     }
@@ -175,6 +208,9 @@ footer a:hover img {
         border-top: 0.2em solid white;
         transform: rotate(-45deg);
         transition: all 0.3s;
+    }
+    .section main {
+        padding-top: 90px;
     }
     article figure {
         max-width: 100%;
