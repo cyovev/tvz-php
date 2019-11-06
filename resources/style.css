@@ -6,14 +6,12 @@ html, body {
 }
 header .hero-image {
     height: 200px;
-    width: 1024px;
     background: url('../images/nbu_logo_white.svg') #161660 no-repeat 50% 50%;
     background-size: 55%;
     margin: 0px auto;
 }
 header nav {
     background: linear-gradient(#8f8f8f,#3C3C3C);
-    width: 100%;
 }
 header nav .nav-toggler-wrapper {
     display: none;
@@ -44,26 +42,81 @@ header nav ul li a:hover, header nav ul li a.active {
     background-color: #a4a4a4;
     transition: all 0.3s;
 }
+section.section {
+    background-color: white;
+    width: 1024px;
+    margin: 0px auto;
+    min-height: 100vh;
+}
+.section main {
+    padding: 15px;
+}
+main a {
+    color: darkblue;
+    transition: color 0.3s;
+}
+main a:hover {
+    color: red;
+    text-decoration: none;
+}
+article figure {
+    border: 1px solid #222222;
+    border-radius: 5px;
+    max-width: 400px;
+}
+figure.left {
+    float: left;
+    margin: 0 15px 15px 0px;
+}
+figure.right {
+    float: right;
+    margin: 0 0 15px 15px;
+}
+figure img {
+    width: 100%;
+    border-radius: 5px 5px 0px 0px;
+    vertical-align: top;
+}
+figure figcaption {
+    border-top: 1px dashed #222222;
+    padding: 8px 5px;
+    font-size: 12px;
+}
+figcaption[title] {
+    cursor: help;
+}
+h1 { font-size: 2em; }
+h2 { font-size: 1.5em; }
+h3 { font-size: 1.17em; }
+h4 { font-size: 1em; }
+h5 { font-size: .83em; }
+h6 { font-size: .67em; }
+p {
+    text-align: justify;
+    line-height: 1.3em;
+}
 
 @media screen and (max-width: 1024px) {
-    header .hero-image, header nav ul {
+    section.section {
         width: 100%;
     }
     header .hero-image {
-        height: 120px;
-        background-size: 65%;
+        height: 90px;
     }
     header nav ul {
         display: none;
+        position: fixed;
     }
     header nav ul li {
         display: block;
+        background-color: #8f8f8f;
+        /*background: linear-gradient(#8f8f8f,#777777);*/
     }
     header nav .nav-toggler-wrapper {
         display: block;
         position: absolute;
         right: 20px;
-        top: 40px;
+        top: 30px;
     }
     header nav #nav-toggler {
         position: relative;
@@ -101,5 +154,11 @@ header nav ul li a:hover, header nav ul li a.active {
         border-top: 0.2em solid white;
         transform: rotate(-45deg);
         transition: all 0.3s;
+    }
+    article figure {
+        max-width: 100%;
+        float: clear !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
     }
 }
