@@ -42,7 +42,7 @@ header nav ul li a:hover, header nav ul li a.active {
     background-color: #a4a4a4;
     transition: all 0.3s;
 }
-section.section {
+div.wrapper {
     background-color: white;
     width: 1024px;
     margin: 0px auto;
@@ -51,7 +51,7 @@ section.section {
     display: flex;
     flex-direction: column
 }
-.section main {
+.wrapper main {
     flex: 1;
     padding: 15px;
 }
@@ -173,9 +173,64 @@ footer a:hover img {
 .description {
     font-weight: bold;
 }
+form, .map {
+    width: 45%;
+    background-color: #CDD6F0;
+    padding: 1em;
+    border-radius: 10px;
+    min-height: 480px;
+    margin-bottom: 2em;
+}
+form {
+    float: left;
+}
+form input:not([type=submit]), form textarea, form select {
+    display: block;
+    width: 100%;
+    margin: 1em 0;
+    background: transparent;
+    border-style: dotted;
+    border-color: #666666;
+    border-width: 0 0 1px 0;
+    font-size: 14px;
+}
+form input:not([type=submit]), form select {
+    line-height: 30px;
+    height: 30px;
+}
+form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+form input[type=submit] {
+    width: 100%;
+    margin-top: 2.9em;
+    background: linear-gradient(#a2bfcb, #81abbc);
+    color: black;
+    border: none;
+    border-radius: 5px;
+    padding: 1em 3em;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+}
+form input[type=submit]:hover {
+    background: #a2bfcb;
+}
+.map {
+    float: right;
+}
+.map iframe {
+    border-radius: 10px;
+    border: 0;
+}
+select:required:invalid { color: gray; }
+option[value=""][disabled] { display: none; }
 
 @media screen and (max-width: 1024px) {
-    section.section {
+    div.wrapper {
         width: 100%;
     }
     header {
@@ -238,7 +293,7 @@ footer a:hover img {
         transform: rotate(-45deg);
         transition: all 0.3s;
     }
-    .section main {
+    .wrapper main {
         padding-top: 90px;
     }
     article figure {
@@ -261,5 +316,10 @@ footer a:hover img {
         display: inline;
         float: left;
         position: relative;
+    }
+    form, .map {
+        float: none;
+        width: 100%;
+        box-sizing: border-box;
     }
 }
