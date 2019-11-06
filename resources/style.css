@@ -229,6 +229,36 @@ form input[type=submit]:hover {
 select:required:invalid { color: gray; }
 option[value=""][disabled] { display: none; }
 
+section.main-gallery {
+    text-align: center;
+}
+section.main-gallery figure {
+    background-color: beige;
+    width: 300px;
+    min-height: 240px;
+    box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.25);
+    border: 1px solid #cecece;
+    text-align: center;
+    padding: 20px 20px 0px 20px;
+    box-sizing: border-box;
+    margin: 0.5em;
+    display: inline-block;
+    vertical-align: top;
+}
+section.main-gallery figure a img {
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 5px;
+    opacity: 0.8;
+}
+section.main-gallery figure a:hover img {
+    opacity: 1;
+    transition: opacity 0.3s
+}
+section.main-gallery figure figcaption {
+    border: none;
+}
+
 @media screen and (max-width: 1024px) {
     div.wrapper {
         width: 100%;
@@ -321,5 +351,10 @@ option[value=""][disabled] { display: none; }
         float: none;
         width: 100%;
         box-sizing: border-box;
+    }
+    section.main-gallery figure {
+        width: 100%;
+        margin: 0.5em 0;
+        height: auto;
     }
 }
