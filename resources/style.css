@@ -68,11 +68,11 @@ article figure {
     border-radius: 5px;
     max-width: 400px;
 }
-figure.left {
+.left {
     float: left;
     margin: 0 15px 15px 0px;
 }
-figure.right {
+.right {
     float: right;
     margin: 0 0 15px 15px;
 }
@@ -258,6 +258,17 @@ section.main-gallery figure a:hover img {
 section.main-gallery figure figcaption {
     border: none;
 }
+video, .poem {
+    width: 50%;
+}
+.poem { border: 1px solid black; }
+.poem pre {
+    line-height: 1.5em;
+}
+.poem h3 {
+    text-align: center;
+    margin: 1.5em;
+}
 
 @media screen and (max-width: 1024px) {
     div.wrapper {
@@ -356,5 +367,12 @@ section.main-gallery figure figcaption {
         width: 100%;
         margin: 0.5em 0;
         height: auto;
+    }
+    video, .poem {
+        width: 100%;
+    }
+    .poem pre {
+        padding: 0 1.5em 0.5em 1.5em;
+        white-space: normal;
     }
 }
