@@ -1,4 +1,8 @@
 <?php
+# Database connection
+include ("conf/dbconn.php");
+##############################
+
 include ('layout/header.php');
 ##############################
 
