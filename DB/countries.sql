@@ -271,36 +271,3 @@ INSERT INTO `countries` (`id`, `iso`, `country_name`) VALUES
     (244, 'zm', 'Zambia'),
     (245, 'zw', 'Zimbabwe');
 /*!40000 ALTER TABLE `countries` ENABLE KEYS */;
-
--- Dumping structure for table tvz.users
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `active` tinyint(3) unsigned DEFAULT '0' COMMENT 'boolean value; inactive user cannot use the CMS',
-  `first_name` varchar(255) DEFAULT NULL,
-  `last_name` varchar(255) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `phone` varchar(255) DEFAULT NULL,
-  `username` varchar(255) DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL,
-  `country_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `created` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `username` (`username`),
-  UNIQUE KEY `email` (`email`),
-  KEY `username_password_active` (`username`,`password`,`active`),
-  KEY `countryFK` (`country_id`),
-  CONSTRAINT `countryFK` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Dumping structure for trigger tvz.users_bi
-SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
-DELIMITER //
-CREATE TRIGGER `users_bi` BEFORE INSERT ON `users` FOR EACH ROW BEGIN
-    SET NEW.created = NOW();
-END//
-DELIMITER ;
-SET SQL_MODE=@OLDTMP_SQL_MODE;
-
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

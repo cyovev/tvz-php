@@ -30,17 +30,30 @@ header nav ul li {
 header nav ul li a {
     display: block;
     line-height: 45px;
-    padding: 0px 15px;
+    padding: 0px 15px 0px 40px;
     text-decoration: none;
     text-transform: uppercase;
     color: #d2d2d2;
     font-size: 13px;
+    background-position: 10px center;
+    background-repeat: no-repeat;
 }
 header nav ul li a:hover, header nav ul li a.active {
     color: white;
     text-shadow: #000000 1px 1px 2px;
     background-color: #a4a4a4;
     transition: all 0.3s;
+}
+.icon-home { background-image: url('../images/icons/home.png'); }
+.icon-news { background-image: url('../images/icons/news.png'); }
+.icon-contact { background-image: url('../images/icons/contact.png'); }
+.icon-about { background-image: url('../images/icons/info.png'); }
+.icon-gallery { background-image: url('../images/icons/gallery.png'); }
+.icon-register { background-image: url('../images/icons/register.png'); }
+.icon-login { background-image: url('../images/icons/login.png'); }
+.icon-logout { background-image: url('../images/icons/logout.png'); }
+header nav ul li a img {
+    vertical-align: middle
 }
 div.wrapper {
     background-color: white;
@@ -53,7 +66,7 @@ div.wrapper {
 }
 .wrapper main {
     flex: 1;
-    padding: 15px;
+    padding: 20px 50px;
 }
 main a {
     color: darkblue;
@@ -175,26 +188,40 @@ footer a:hover img {
 }
 form, .map {
     width: 45%;
-    background-color: #CDD6F0;
+    background-color: #ECECEC;
     padding: 1em;
     border-radius: 10px;
-    min-height: 480px;
+    /*min-height: 480px;*/
     margin-bottom: 2em;
+}
+form.long {
+    width: auto;
+    float: none;
 }
 form {
     float: left;
 }
-form input:not([type=submit]), form textarea, form select {
+form input:not([type=submit]), form textarea {
     display: block;
     width: 100%;
     margin: 1em 0;
     background: transparent;
+    border-width: 1px;
     border-style: dotted;
-    border-color: #666666;
-    border-width: 0 0 1px 0;
+    border-color: transparent transparent #666666 transparent;
     font-size: 14px;
+    padding-left: 4px;
+    transition: all 0.3s;
 }
-form input:not([type=submit]), form select {
+form input:not([type=submit]):focus, form textarea:focus {
+    background: white;
+    border: 1px solid #10213a;
+    border-radius: 4px;
+}
+form textarea {
+    padding-top: 4px;
+}
+form input:not([type=submit]) {
     line-height: 30px;
     height: 30px;
 }
@@ -219,6 +246,34 @@ form input[type=submit] {
 form input[type=submit]:hover {
     background: #a2bfcb;
 }
+.basic-select { width: 100% !important; }
+.select2-image { max-height: 20px; max-width: 20px; border-radius: 4px; margin-right: 5px; vertical-align: middle; }
+.select2-container-active .select2-choice, .select2-container-active .select2-choices, .select2-drop-active, .select2-drop.select2-drop-above.select2-drop-active,.select2-dropdown-open.select2-drop-above .select2-choice, .select2-dropdown-open.select2-drop-above .select2-choices, .select2-container-multi.select2-dropdown-open .select2-choices, .select2-container-multi.select2-container-active .select2-choices {border:1px solid #10213a; box-shadow:none}
+.select2-results .select2-highlighted, li.ms-hover { background-color: #2A3542 !important; }
+.select2-container-multi .select2-choices {border-radius: 4px; min-height: 34px; }
+.select2-dropdown-open .select2-choices { border-radius: 4px 4px 0px 0px; }
+.select2-container-multi .select2-choices .select2-search-choice { margin-top: 5px; }
+.select2-container .select2-choice { height: 34px; line-height: 30px; vertical-align: middle; }
+.select2-chosen { position: relative; top: 3px; }
+.select2-container .select2-choice .select2-arrow b { background-position: 0 3px; }
+.select2-dropdown-open .select2-choice .select2-arrow b { background-position: -18px 3px; }
+.select2-drop-active:not(.select2-drop-above) { border-top: none !important; }
+.select2-drop-active.select2-drop-above { border-bottom: none !important; }
+.select2-results .select2-disabled { display: none; }
+.select2-input { z-index: 9999; }
+.basic-select:not(.select2-container-active) a .select2-arrow {
+    background: none !important;
+    border: none;
+}
+.basic-select:not(.select2-container-active) a {
+    background: transparent;
+    border-style: dotted;
+    border-color: #666666;
+    border-width: 0 0 1px 0;
+    font-size: 14px;
+    font-family: inherit;
+    color: gray;
+}
 .map {
     float: right;
 }
@@ -226,15 +281,13 @@ form input[type=submit]:hover {
     border-radius: 10px;
     border: 0;
 }
-select:required:invalid { color: gray; }
-option[value=""][disabled] { display: none; }
 
 section.main-gallery {
     text-align: center;
 }
 section.main-gallery figure {
     background-color: beige;
-    width: 300px;
+    width: 280px;
     min-height: 240px;
     box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.25);
     border: 1px solid #cecece;
@@ -279,7 +332,28 @@ video, .poem {
 .error-404-text {
     text-align: center;
 }
-
+.message {
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.25);
+    background-color: rgba(0, 0, 0, 0.05);
+    border: 1px dashed rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    max-width: 100%;
+    position: relative;
+    border-radius: 4px;
+}
+.message.success {
+    color: green;
+}
+.message.errors {
+    color: red;
+}
+.message .close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    margin-left: 10px;
+}
 @media screen and (max-width: 1024px) {
     div.wrapper {
         width: 100%;
@@ -341,7 +415,7 @@ video, .poem {
         transform: rotate(135deg);
     }
     .wrapper main {
-        padding-top: 90px;
+        margin-top: 90px;
     }
     article figure {
         max-width: 100%;

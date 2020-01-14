@@ -1,3 +1,7 @@
+<?php
+include ('layout/header.php');
+?>
+
 <article>
     <h1>About the University</h1>
     <figure class="right">
@@ -26,3 +30,7 @@
 
     <p>To learn more about the university structure, click <a href="https://nbu.bg/en/about-nbu/new-bulgarian-university/university-campus" target="_blank" title="Opens in new tab">here</a>.
 </article>
+
+<?php
+include ('layout/footer.php');
+?>

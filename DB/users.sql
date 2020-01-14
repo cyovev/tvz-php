@@ -18,10 +18,12 @@ CREATE TABLE IF NOT EXISTS `users` (
   `first_name` varchar(255) DEFAULT NULL,
   `last_name` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
-  `phone` varchar(255) DEFAULT NULL,
+  `country_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `city` varchar(255) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `birth_date` date DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `country_id` int(10) unsigned NOT NULL DEFAULT '0',
   `created` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
@@ -29,16 +31,14 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `username_password_active` (`username`,`password`,`active`),
   KEY `countryFK` (`country_id`),
   CONSTRAINT `countryFK` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
--- Dumping structure for trigger tvz.users_bi
-SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
-DELIMITER //
-CREATE TRIGGER `users_bi` BEFORE INSERT ON `users` FOR EACH ROW BEGIN
-    SET NEW.created = NOW();
-END//
-DELIMITER ;
-SET SQL_MODE=@OLDTMP_SQL_MODE;
+-- Dumping data for table tvz.users: ~0 rows (approximately)
+DELETE FROM `users`;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` (`id`, `active`, `first_name`, `last_name`, `email`, `country_id`, `city`, `address`, `birth_date`, `username`, `password`, `created`) VALUES
+    (1, 1, 'Christo', 'Yovev', 'cyovev@tvz.hr', 52, 'Zagreb', 'Trnsko 30B', '1990-08-14', 'cyovev', '$2y$10$uDRp2C1LPUsIWHSy.snCnOxpqrpNvrpR/aePmAcTrNbqG7ItOHBpK', '2020-01-14 14:55:08');
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
