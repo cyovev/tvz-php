@@ -1,5 +1,7 @@
 <?php
+if (count(get_included_files()) <= 1) die("Direct access forbidden");
 $countries = getCountriesList();
+$metaTitle = 'Contact';
 include ('layout/header.php');
 ?>
 <section>
@@ -32,7 +34,7 @@ include ('layout/header.php');
 
         <textarea name="message" id="message" placeholder="* Message" ></textarea>
 
-        <input type="submit" value="Send" />
+        <div class="center"><input type="submit" value="Send" /></div>
     </form>
 </section>
 

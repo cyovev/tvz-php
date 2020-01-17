@@ -1,4 +1,6 @@
 <?php
+if (count(get_included_files()) <= 1) die("Direct access forbidden");
+$metaTitle = 'Gallery';
 include ('layout/header.php');
 ?>
 

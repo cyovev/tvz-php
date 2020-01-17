@@ -13,6 +13,9 @@ header .hero-image {
 header nav {
     background: linear-gradient(#8f8f8f,#3C3C3C);
 }
+header nav.logged {
+    background: linear-gradient(#5A5881, #332747);
+}
 header nav .nav-toggler-wrapper {
     display: none;
     cursor: pointer;
@@ -38,6 +41,9 @@ header nav ul li a {
     background-position: 10px center;
     background-repeat: no-repeat;
 }
+header nav.logged ul li a {
+    background-color: #5A5881;
+}
 header nav ul li a:hover, header nav ul li a.active {
     color: white;
     text-shadow: #000000 1px 1px 2px;
@@ -52,6 +58,7 @@ header nav ul li a:hover, header nav ul li a.active {
 .icon-register { background-image: url('../images/icons/register.png'); }
 .icon-login { background-image: url('../images/icons/login.png'); }
 .icon-logout { background-image: url('../images/icons/logout.png'); }
+.icon-admin { background-image: url('../images/icons/admin.png'); }
 header nav ul li a img {
     vertical-align: middle
 }
@@ -98,6 +105,8 @@ figure figcaption {
     border-top: 1px dashed #222222;
     padding: 8px 5px;
     font-size: 12px;
+    background: white;
+    border-radius: 4px;
 }
 figcaption[title] {
     cursor: help;
@@ -138,6 +147,7 @@ footer a:hover img {
     opacity: 0.7;
     border-radius: 5px;
     height: 100px;
+    width: 133px;
     float: left;
     margin-right: 1em;
 }
@@ -163,6 +173,9 @@ footer a:hover img {
 .gallery .thumbs {
     text-align: center;
     float: left;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-right: 1em;
 }
 .gallery .thumbs img {
     border-radius: 3px;
@@ -178,15 +191,16 @@ footer a:hover img {
     transition: opacity 0.3s;
 }
 .gallery figure {
-    max-width: 460px;
+    width: 310px;
     float: right;
     margin-top: 0;
-    margin-left: 1em;
+    margin-left: 0;
+    background: url('../images/news/no-image.jpg') no-repeat 50% 40% #dddddd;
 }
 .description {
     font-weight: bold;
 }
-form, .map {
+form:not(.admin-form), .map {
     width: 45%;
     background-color: #ECECEC;
     padding: 1em;
@@ -198,10 +212,10 @@ form.long {
     width: auto;
     float: none;
 }
-form {
+form:not(.admin-form):not(.long) {
     float: left;
 }
-form input:not([type=submit]), form textarea {
+form:not(.admin-form) input:not([type=submit]), form:not(.admin-form) textarea {
     display: block;
     width: 100%;
     margin: 1em 0;
@@ -212,26 +226,26 @@ form input:not([type=submit]), form textarea {
     font-size: 14px;
     padding-left: 4px;
     transition: all 0.3s;
+    box-sizing: border-box;
 }
-form input:not([type=submit]):focus, form textarea:focus {
+form:not(.admin-form) input:not([type=submit]):focus, form:not(.admin-form) textarea:focus {
     background: white;
     border: 1px solid #10213a;
     border-radius: 4px;
 }
-form textarea {
+form:not(.admin-form) textarea {
     padding-top: 4px;
 }
-form input:not([type=submit]) {
+form:not(.admin-form) input:not([type=submit]) {
     line-height: 30px;
     height: 30px;
 }
-form textarea {
+form:not(.admin-form) textarea {
     min-height: 120px;
     resize: vertical;
 }
-form input[type=submit] {
-    width: 100%;
-    margin-top: 2.9em;
+form:not(.admin-form) input[type=submit] {
+    margin: 2.9em auto 0 auto;
     background: linear-gradient(#a2bfcb, #81abbc);
     color: black;
     border: none;
@@ -243,10 +257,13 @@ form input[type=submit] {
     letter-spacing: 0.2em;
     cursor: pointer;
 }
-form input[type=submit]:hover {
+form:not(.admin-form) input[type=submit]:hover {
     background: #a2bfcb;
 }
-.basic-select { width: 100% !important; }
+label {
+    cursor: pointer;
+}
+form .basic-select { width: 100% !important; }
 .select2-image { max-height: 20px; max-width: 20px; border-radius: 4px; margin-right: 5px; vertical-align: middle; }
 .select2-container-active .select2-choice, .select2-container-active .select2-choices, .select2-drop-active, .select2-drop.select2-drop-above.select2-drop-active,.select2-dropdown-open.select2-drop-above .select2-choice, .select2-dropdown-open.select2-drop-above .select2-choices, .select2-container-multi.select2-dropdown-open .select2-choices, .select2-container-multi.select2-container-active .select2-choices {border:1px solid #10213a; box-shadow:none}
 .select2-results .select2-highlighted, li.ms-hover { background-color: #2A3542 !important; }
@@ -265,7 +282,7 @@ form input[type=submit]:hover {
     background: none !important;
     border: none;
 }
-.basic-select:not(.select2-container-active) a {
+form:not(.admin-form) .basic-select:not(.select2-container-active) a {
     background: transparent;
     border-style: dotted;
     border-color: #666666;
@@ -274,7 +291,7 @@ form input[type=submit]:hover {
     font-family: inherit;
     color: gray;
 }
-.map {
+.map, .place-right {
     float: right;
 }
 .map iframe {
@@ -354,6 +371,149 @@ video, .poem {
     top: 10px;
     margin-left: 10px;
 }
+/*.admin-nav { display: inline-block; }*/
+.admin-nav a {
+    background-color: #161660;
+    color: white;
+    width: 150px;
+    line-height: 40px;
+    box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.55);
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0.5em 0.5em 0.5em 0;
+    display: inline-block;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s;
+}
+.admin-nav a.active, .admin-nav a:hover {
+    background-color: red;
+    color: white;
+}
+.admin-nav + .message {
+    margin-top: 0.5cm;
+}
+.admin-actions {  margin: 10px 10px 0px 0px; }
+.admin-actions a {
+    background-color: #161660;
+    padding: 10px;
+    line-height: 20px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: white;
+}
+.admin-actions a img, .admin-nav a img {
+    vertical-align: middle;
+    max-height: 24px;
+    margin-right: 10px;
+}
+.admin-table {
+    margin-top: 1cm;
+    width: 100%;
+    font-size: sans-serif;
+    font-size: 14px;
+}
+.admin-table th {
+    background: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.35));
+    padding: 10px 5px;
+}
+.admin-table td {
+    background-color: rgba(0, 0, 0, 0.15);
+    padding: 5px;
+}
+.admin-table tr:nth-child(odd) td {
+    background-color: rgba(0, 0, 0, 0.20);
+}
+.admin-table tr:hover td {
+    transition: all 0.3s;
+    background-color: rgba(0, 255, 0, 0.15);
+}
+.admin-table td img {
+    margin: auto 3px;
+    vertical-align: middle
+}
+.admin-table td.cover img {
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+}
+.center {
+    text-align: center;
+}
+form.admin-form {
+    background-color: rgba(0, 0, 0, 0.10);
+    border-radius: 4px;
+    padding: 20px;
+    margin-top: 0.5cm;
+}
+form.admin-form input:not([type=submit]):not([type=radio]):not([type=checkbox]), form.admin-form textarea {
+    padding: 0 0 0 8px;
+    overflow: hidden;
+    border: 1px solid #aaa;
+    line-height: 32px;
+    border-radius: 4px;
+    background: linear-gradient(#fff,#eee);
+    width: 100%;
+    box-sizing: border-box;
+}
+form.admin-form input:not([type=submit]):not([type=radio]):focus, form.admin-form textarea:focus {
+    background: linear-gradient(#fff,#f2f0f0);
+    border: 1px solid black;
+}
+form.admin-form input[type=radio] {
+    position: relative;
+    top: 3px;
+}
+form.admin-form textarea {
+    line-height: initial;
+    padding: 10px;
+}
+.admin-form .row {
+    border-bottom: 1px dashed #9E9E9E;
+    padding: 5px;
+    margin-bottom: 15px;
+}
+.admin-form label:not(.radio) {
+    width: 20%;
+    display: inline-block;
+    vertical-align: top;
+}
+.admin-form .field {
+    width: 75%;
+    display: inline-block;
+}
+.admin-form .field label img {
+    vertical-align: bottom;
+}
+.transparent {
+    opacity: 0.5;
+}
+.table-wrapper {
+    overflow-x: auto;
+}
+.admin-form .thumbs {
+    margin-bottom: 0.5cm;
+}
+.admin-form .thumbs a {
+    vertical-align: top;
+}
+.admin-form .thumbs img {
+    max-width: 90px;
+    max-height: 90px;
+    vertical-align: middle;
+    margin: 0.1cm;
+    border-radius: 4px;
+    box-shadow: 2px 2px 5px 0px rgba(0, 0, 0, 0.35);
+}
+.title {
+    max-width: 400px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.small { font-size: 12px; }
 @media screen and (max-width: 1024px) {
     div.wrapper {
         width: 100%;
@@ -416,6 +576,7 @@ video, .poem {
     }
     .wrapper main {
         margin-top: 90px;
+        padding: 20px;
     }
     article figure {
         max-width: 100%;
@@ -438,7 +599,7 @@ video, .poem {
         float: left;
         position: relative;
     }
-    form, .map {
+    form:not(.admin-form), .map {
         float: none;
         width: 100%;
         box-sizing: border-box;
@@ -454,5 +615,17 @@ video, .poem {
     .poem pre {
         padding: 0 1.5em 0.5em 1.5em;
         white-space: normal;
+    }
+    .admin-nav a {
+        width: 120px;
+    }
+    .admin-form { padding: 10px; }
+    .admin-form label:not(.radio) {
+        width: 100%;
+        display: block;
+    }
+    .admin-form .field {
+        width: 100%;
+        display: block;
     }
 }

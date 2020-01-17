@@ -1,4 +1,6 @@
 <?php
+if (count(get_included_files()) <= 1) die("Direct access forbidden");
+$metaTitle = 'Error 404';
 include ('layout/header.php');
 ?>
 

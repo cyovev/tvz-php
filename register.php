@@ -1,40 +1,39 @@
 <?php
+if (count(get_included_files()) <= 1) die("Direct access forbidden");
+if ($userLoggedIn) {
+    header("Location: ."); exit;
+}
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 /*                                FUNCTIONS                                    */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 ///////////////////////////////////////////////////////////////////////////////
-function createRegistration(&$data) {
+function createRegistration(&$data, $active = 0, $role = 'user') {
     global $mysqli;
-    $errors = checkEmailUniqueness($data['email']);
     $status = 0;
-    if (!$errors) {
-        $data['active']   = 1; // mark the user as activated straight away
-        $data['username'] = generateUsername($data['first_name'], $data['last_name']);
-        $password         = password_hash($data['password'], PASSWORD_DEFAULT);
-        $query            = $mysqli->prepare("INSERT INTO `users` (`active`, `first_name`, `last_name`, `email`, `country_id`, `city`, `address`, `birth_date`, `username`, `password`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-        $query->bind_param("ssssssssss", $data['active'], $data['first_name'], $data['last_name'], $data['email'], $data['country_id'], $data['city'], $data['address'], $data['birth_date'], $data['username'], $password);
+    $errors = false;
+    if (isFieldAvailable('email', $data['email'])) {
+        $data['active']     = $active;
+        $data['role']       = $role;
+        $data['username']   = generateUsername($data['first_name'], $data['last_name']);
+        $password           = password_hash($data['password'], PASSWORD_DEFAULT);
+
+        // non-required fields, if empty, should be pased as NULL
+        $data['city']       = ($data['city'])       ? $data['city']       : NULL;
+        $data['address']    = ($data['address'])    ? $data['address']    : NULL;
+        $data['birth_date'] = ($data['birth_date']) ? $data['birth_date'] : NULL;
+        
+        $query              = $mysqli->prepare("INSERT INTO `users` (`active`, `first_name`, `last_name`, `email`, `country_id`, `city`, `address`, `birth_date`, `username`, `password`, `role`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        $query->bind_param("issssisssss", $data['active'], $data['first_name'], $data['last_name'], $data['email'], $data['country_id'], $data['city'], $data['address'], $data['birth_date'], $data['username'], $password, $data['role']);
         $query->execute();
         $query->close();
 
         $status = 1;
     }
+    else {
+        $errors = 'The email address <strong>'.$email.'</strong> is already in use.<br /> Please choose a different one.';
+    }
 
     return array($status, $errors);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// check if there's a record in the `users` table with the same email address
-function checkEmailUniqueness($email) {
-    global $mysqli;
-
-    $query = $mysqli->prepare("SELECT COUNT(*) FROM `users` WHERE `email` = ?");
-    $query->bind_param("s", $email);
-    $query->execute();
-    $query->bind_result($result);
-    $query->fetch();
-    $query->close();
-    
-    return ($result) ? 'The email address <strong>'.$email.'</strong> is already in use.<br /> Please choose a different one.' : false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,13 +84,14 @@ function simplify($string) {
 $countries = getCountriesList();
 if ($_POST) {
     $data                   = recursive_html_escape($_POST);
-    list ($status, $errors) = createRegistration($data);
+    list ($status, $errors) = createRegistration($data, 0, 'user'); // mark the user as inactive, they have to be approved first
 
     // if the status is true, the registration was successful:
-    // log in the user, set success message session
-    // and redirect to home page
+    // notify the user that their account needs to be activated,
+    // and redirect them to home page
     if ($status) {
-        markAsLoggedIn($data, 'Thank you for registering! Your username is: '.$data['username']);
+        setFlashMessage('success', 'You have successfully registered; your username is: '.$data['username'].'<br />Please wait for your account to be activated.');
+        header("Location: .");exit;
     }
 
     // otherwise display the error message
@@ -135,7 +135,7 @@ include ('layout/header.php');
 
         <input type="text" name="birth_date" id="birth_date" class="datepicker" placeholder="Birth Date (YYYY-MM-DD)" pattern="[0-9]{4}-(0[1-9]|1[012])-[0-9]{2}" value="<?= @$data['birth_date']; ?>"  />
 
-        <input type="submit" value="Register" />
+        <div class="center"><input type="submit" value="Register" /></div>
     </form>
 </section>
 

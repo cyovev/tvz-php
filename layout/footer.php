@@ -1,3 +1,6 @@
+<?php
+if (count(get_included_files()) <= 1) die("Direct access forbidden");
+?>
         </main>
         <footer>
             Copyright &copy; <?php echo date("Y"); ?> Christo Yovev.

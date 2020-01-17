@@ -24,6 +24,40 @@ $(document).ready(function() {
         dateFormat: 'yy-mm-dd'
     });
 
+    if (typeof (tinymce) == 'object') {
+        $('textarea.tinymce').tinymce({
+            height: 300,
+            menubar: false,
+            plugins: [
+                "advlist autolink lists link hr code anchor contextmenu paste code"
+            ],
+            toolbar1: "bold italic underline | bullist numlist | link | alignleft aligncenter alignright alignjustify | outdent indentb | code",
+            paste_as_text: true,
+            relative_urls: false
+        });
+    }
+
+    $(document).on('click', '.gallery .thumbs img:not(.active)', function() {
+        var $this = $(this),
+            src   = $this.attr('src');
+
+        // remove class active from other thumbs
+        $this.siblings().removeClass('active');
+
+        // fade out the image, wait for the animation to complete
+        // replace the src of the main image using the src of the thumb
+        // and then fade back in the image
+        $this.parents('.gallery').find('figure > img').fadeOut(300, function() {
+            $(this).attr('src', src).fadeIn(300);
+        });
+
+        // do the same for the figcaption html using the alt attribute
+        $this.parents('.gallery').find('figure > figcaption').html($this.attr('alt'));
+
+        // add class active to current thumb
+        $this.addClass('active');
+    });
+
 });
 
 function select2AddImage(item) {

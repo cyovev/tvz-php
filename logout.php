@@ -1,4 +1,5 @@
 <?php
+if (count(get_included_files()) <= 1) die("Direct access forbidden");
 // unset the user, destroy the session
 unset($_SESSION['user']);
 session_destroy();

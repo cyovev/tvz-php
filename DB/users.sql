@@ -5,12 +5,6 @@
 -- HeidiSQL Version:             10.2.0.5599
 -- --------------------------------------------------------
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-
 -- Dumping structure for table tvz.users
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -24,22 +18,29 @@ CREATE TABLE IF NOT EXISTS `users` (
   `birth_date` date DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
+  `role` enum('admin','editor','user') DEFAULT 'user',
+  `approver_id` int(10) unsigned DEFAULT NULL COMMENT 'ID of the user who has approved the registration of this user',
   `created` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
   KEY `username_password_active` (`username`,`password`,`active`),
   KEY `countryFK` (`country_id`),
+  KEY `approverFK` (`approver_id`),
+  CONSTRAINT `approverFK` FOREIGN KEY (`approver_id`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `countryFK` FOREIGN KEY (`country_id`) REFERENCES `countries` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
--- Dumping data for table tvz.users: ~0 rows (approximately)
-DELETE FROM `users`;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` (`id`, `active`, `first_name`, `last_name`, `email`, `country_id`, `city`, `address`, `birth_date`, `username`, `password`, `created`) VALUES
-    (1, 1, 'Christo', 'Yovev', 'cyovev@tvz.hr', 52, 'Zagreb', 'Trnsko 30B', '1990-08-14', 'cyovev', '$2y$10$uDRp2C1LPUsIWHSy.snCnOxpqrpNvrpR/aePmAcTrNbqG7ItOHBpK', '2020-01-14 14:55:08');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
 
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+INSERT INTO `users` (`id`, `active`, `first_name`, `last_name`, `email`, `country_id`, `city`, `address`, `birth_date`, `username`, `password`, `role`, `approver_id`, `created`) VALUES
+    (1, 1, 'Christo', 'Yovev', 'cyovev@tvz.hr', 33, 'Zagreb', 'Trnsko 30B', '1990-08-14', 'cyovev', '$2y$10$BGhXpoqc7APPOgtmqNxClefXZAo9UOBrqdWv9VnNzAhjrBc6sIYKm', 'admin', NULL, '2020-01-14 14:55:08'),
+    (2, 1, 'Some', 'User', 'test@test.com', 14, NULL, NULL, NULL, 'suser', '$2y$10$BGhXpoqc7APPOgtmqNxClefXZAo9UOBrqdWv9VnNzAhjrBc6sIYKm', 'user', 1, '2020-01-16 14:52:16');
+
+-- Dumping structure for trigger tvz.users_bi
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `users_bi` BEFORE INSERT ON `users` FOR EACH ROW BEGIN
+    SET NEW.created = NOW();
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
