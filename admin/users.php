@@ -1,6 +1,10 @@
 <?php
 if (count(get_included_files()) <= 1) die("Direct access forbidden");
 
+$canListUsers   = (bool) in_array('index',  $permissions[$role][$section]);
+$canEditUsers   = (bool) in_array('edit',   $permissions[$role][$section]);
+$canDeleteUsers = (bool) in_array('delete', $permissions[$role][$section]);
+
 // list all users if the user has permission to see them
 // NB! if they don't have the permission, the $action would be set to false anyways
 if ($action == 'index') {
@@ -19,12 +23,12 @@ if ($action == 'index') {
                 <th>Register date</th>';
 
     // if the user has permission to edit other users, show the «Role» column
-    if (in_array('edit', $permissions[$role][$section])) {
+    if ($canEditUsers) {
         echo '<th>Role</th><th>Approved by</th>';
     }
 
     // if the user has permission to any actions, show the column «Actions»
-    if (in_array('edit', $permissions[$role][$section]) || in_array('delete', $permissions[$role][$section])) {
+    if ($canEditUsers || $canDeleteUsers) {
         echo '<th>Actions</th>';
     }
 
@@ -41,19 +45,19 @@ if ($action == 'index') {
                   <td>' . $item['created'] . '</td>';
 
         // if the user has permission to edit other users, show info about author and approver
-        if (in_array('edit', $permissions[$role][$section])) {
+        if ($canEditUsers) {
             echo '<td>' . ucfirst($item['role']) . '</td>';
-            echo '<td>' . ($item['approver'] ? $item['approver'] : '&ndash;') . '</td>';
+            echo '<td>' . ($item['approver'] && $item['active'] ? $item['approver'] : '&ndash;') . '</td>';
         }
 
         // if the user has permission to edit/delete other users,
         // generate respective links
-        if (in_array('edit', $permissions[$role][$section]) || in_array('delete', $permissions[$role][$section])) {
+        if ($canEditUsers || $canDeleteUsers) {
             echo '<td class="center">';
-            if (in_array('edit',   $permissions[$role][$section])) {
+            if ($canEditUsers) {
                 echo '<a href="index.php?page=admin&section=users&action=edit&id='   . $item['id'] . '" title="Edit"><img src="images/icons/edit.png" /></a>';
             }
-            if (in_array('delete', $permissions[$role][$section])) {
+            if ($canDeleteUsers) {
                 if ($item['id'] != $_SESSION['user']['id']) { echo '<a href="index.php?page=admin&section=users&action=delete&id=' . $item['id'] . '" title="Delete" onclick="javascript: return (confirm(\'Are you sure you want to delete this item?\'));"><img src="images/icons/delete.png" /></a>'; }
                 else { echo '<img src="images/icons/delete.png" class="transparent" title="Delete" />'; }
             }
@@ -80,8 +84,7 @@ elseif ($action == 'edit') {
 
         // if the form was submitted, try to save the changes
         if ($_POST) {
-            // escape all user input to prevent SQL injections on UPDATE
-            $data = recursive_mysqli_escape($_POST);
+            $data = $_POST;
 
             // check if there's another user with the same username
             if (!isFieldAvailable('username', $data['username'], $id)) {
@@ -106,44 +109,57 @@ elseif ($action == 'edit') {
             // if there were no errors, proceed with the saving
             if (!$errors) {
                 // non-required fields, if empty, should be pased as NULL
-                $city       = ($data['city'])       ? "'".$data['city']."'"       : 'NULL';
-                $address    = ($data['address'])    ? "'".$data['address']."'"    : 'NULL';
-                $birth_date = ($data['birth_date']) ? "'".$data['birth_date']."'" : 'NULL';
+                $data['city']       = ($data['city'])       ? $data['city']       : NULL;
+                $data['address']    = ($data['address'])    ? $data['address']    : NULL;
+                $data['birth_date'] = ($data['birth_date']) ? $data['birth_date'] : NULL;
 
-                // prepare the query
-                $query = "UPDATE `users` SET
-                    `active`     = {$data['active']},
-                    `role`       = '{$data['role']}',
-                    `first_name` = '{$data['first_name']}',
-                    `last_name`  = '{$data['last_name']}',
-                    `username`   = '{$data['username']}',
-                    `email`      = '{$data['email']}',
-                    `country_id` = '{$data['country_id']}',
-                    `city`       =  {$city},
-                    `address`    =  {$address},
-                    `birth_date` =  {$birth_date}";
+                $statement = "UPDATE `users` SET `active` = ?, `role` = ?, `first_name` = ?, `last_name` = ?, `username` = ?, `email` = ?, `country_id` = ?, `city` = ?, `address` = ?, `birth_date` = ?";
+
+                // stores the parameters used for the query (they can be dynamic)
+                $params = array("isssssisss", $data['active'], $data['role'], $data['first_name'], $data['last_name'], $data['username'], $data['email'], $data['country_id'], $data['city'], $data['address'], $data['birth_date']);
 
                 // if the user was inactive so far, and now they get activated
                 // use the current user's ID as approver_id
                 if (!$user['active'] && $data['active']) {
-                    $data['approver_id'] = $_POST['approver_id'] = $_SESSION['user']['id'];
-                    $_POST['approver']   = $_SESSION['user']['username'];
-                    $query              .= ", `approver_id` = ".intval($data['approver_id']);
+                    $data['approver_id'] = $_SESSION['user']['id'];
+                    $data['approver']    = $_SESSION['user']['username'];
+
+                    // add approver id to the query
+                    $statement          .= ", `approver_id` = ?";
+
+                    // add type of value and value to the parameters
+                    $params[0]          .= 'i';
+                    $params[]            = intval($data['approver_id']);
                 }
 
                 // if the password field was filled in,
                 // hash it and store it
                 if ($data['password']) {
-                    $data['password'] = $_POST['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-                    $query           .= ", `password` = '".$data['password']."'";
+                    $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
+
+                    // add approver id to the query
+                    $statement       .= ", `password` = ?";
+
+                    // add type of value and value to the parameters
+                    $params[0]       .= 's';
+                    $params[]         = $data['password'];
                 }
 
                 // add the ID of the user to the query
                 // (to prevent all other users from being updated :))
-                $query .= " WHERE `id` = ".$id;
+                $statement .= " WHERE `id` = ".$id;
 
-                // run the query
-                $mysqli->query($query);
+                // prepare the query
+                $query  = $mysqli->prepare($statement);
+
+                // pass the array parameters as single arguments
+                $ref    = new ReflectionClass('mysqli_stmt');
+                $method = $ref->getMethod("bind_param");
+                $method->invokeArgs($query, makeValuesReferenced($params));
+
+                // execute and close the query
+                $query->execute();
+                $query->close();
 
                 // store any potential mysql errors returned from the server
                 $errors = $mysqli->error;
@@ -151,7 +167,7 @@ elseif ($action == 'edit') {
             }
 
             // when displaying data, use the one that the user entered last
-            $user = recursive_html_escape($_POST);
+            $user = recursive_html_escape($data);
 
             // if any errors occured during the saving, display them
             if ($errors) {
@@ -292,7 +308,7 @@ elseif ($action == 'delete') {
 
     // if the user has permissions to see the users list,
     // generate a link to get them there
-    if (in_array('index', $permissions[$role][$section])) {
+    if ($canListUsers) {
         $flashMsg .= '<br />Go back to <a href="index.php?page=admin&section='.$section.'&action=index">all users</a>.';
     }
 

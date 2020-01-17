@@ -1,9 +1,16 @@
 <?php
 if (count(get_included_files()) <= 1) die("Direct access forbidden");
 
+$canListNews   = (bool) in_array('index',  $permissions[$role][$section]);
+$canAddNews    = (bool) in_array('add',    $permissions[$role][$section]);
+$canEditNews   = (bool) in_array('edit',   $permissions[$role][$section]);
+$canDeleteNews = (bool) in_array('delete', $permissions[$role][$section]);
+
+$canEditUsers  = (bool) in_array('edit',   $permissions[$role]['users']);
+
 // the deletion of thumbs is an action on its own, but it actually belongs to the edit action
 // therefore, once done, simulate going to the edit action
-if (isset($_GET['action']) && ($_GET['action'] == 'delete_thumb') && in_array('edit', $permissions[$role][$section])) {
+if (isset($_GET['action']) && ($_GET['action'] == 'delete_thumb') && $canEditNews) {
     $id      = (isset($_GET['id'])) ? intval($_GET['id']) : false;
     $news_id = intval($_GET['news_id']);
 
@@ -16,13 +23,17 @@ if (isset($_GET['action']) && ($_GET['action'] == 'delete_thumb') && in_array('e
     }
     else {
         $mysqli->query("DELETE FROM `news_images` WHERE `id` = ".$id);
-        @unlink('images/news/uploads/'.$news_id.'/'.$row['file_name']);
 
-        // check how many files are left in the folder (slicing 2 because of folders . and ..)
+        $itemFolder = 'images/news/uploads/'.$news_id;
+        @unlink($itemFolder.'/'.$row['file_name']);
+
+        // check how many files are left in the folder (after the deletion)
         // if there are none, simply delete the folder as well
-        if (!array_slice(scandir('images/news/uploads/'.$news_id), 2)) {
-            @rmdir('images/news/uploads/'.$news_id);
+        $filesInFolder = array_slice(scandir($itemFolder), 2); // slicing 2 because of folders . and ..
+        if (!$filesInFolder) {
+            @rmdir($itemFolder);
         }
+        
         printFlashMessage('success', 'Image deleted successfully!');
     }
 
@@ -33,7 +44,7 @@ if (isset($_GET['action']) && ($_GET['action'] == 'delete_thumb') && in_array('e
 
 // if the user has permission to add new articles,
 // generate a link to do so
-if (in_array('add', $permissions[$role][$section]) && (!$action || ($action == 'index'))) {
+if ($canAddNews && (!$action || ($action == 'index'))) {
     echo '<div class="admin-actions">
               <a href="index.php?page=admin&section='.$section.'&action=add"><img src="images/icons/add.png" width="16" />Add new</a>
           </div>';
@@ -55,12 +66,12 @@ if ($action == 'index') {
                 <th>Published</th>';
 
     // if the user has permission to edit other users, show the «Author» and «Approved By» columns 
-    if (in_array('edit', $permissions[$role]['users'])) {
+    if ($canEditUsers) {
         echo '<th>Author</th><th>Approved By</th>';
     }
 
     // if the user has permission to any actions, show the column «Actions»
-    if (in_array('edit', $permissions[$role][$section]) || in_array('delete', $permissions[$role][$section])) {
+    if ($canEditNews || $canDeleteNews) {
         echo '<th>Actions</th>';
     }
 
@@ -79,9 +90,10 @@ if ($action == 'index') {
                   <td><div class="title" title="' . $item['title'] . '">' . $item['title'] . '</div></td>
                   <td class="center">' . $item['created'] . '</td>';
 
-        // if the user has permission to edit other users, show info about author and approver
-        if (in_array('edit', $permissions[$role]['users'])) {
+        // if the user has permission to edit other users, show info about author and approver (if any)
+        if ($canEditUsers) {
             echo '<td><a href="index.php?page=admin&section=users&action=edit&id='.$item['author_id'].'" title="Open profile">'.$item['author'].'</a></td>';
+
             if ($item['approver'] && $item['active']) {
                 echo '<td><a href="index.php?page=admin&section=users&action=edit&id='.$item['approver_id'].'" title="Open profile">'.$item['approver'].'</a></td>';
             }
@@ -92,10 +104,10 @@ if ($action == 'index') {
 
         // if the user has permission to edit/delete news articles,
         // generate respective links
-        if (in_array('edit', $permissions[$role][$section]) || in_array('delete', $permissions[$role][$section])) {
+        if ($canEditNews || $canDeleteNews) {
             echo '<td class="center actions">';
-            if (in_array('edit',   $permissions[$role][$section])) { echo '<a href="index.php?page=admin&section=news&action=edit&id='  .$item['id'].'" title="Edit"><img src="images/icons/edit.png" /></a>'; }
-            if (in_array('delete', $permissions[$role][$section])) { echo '<a href="index.php?page=admin&section=news&action=delete&id='.$item['id'].'" title="Delete" onclick="javascript: return (confirm(\'Are you sure you want to delete this item?\'));"><img src="images/icons/delete.png" /></a>'; }
+            if ($canEditNews)   { echo '<a href="index.php?page=admin&section=news&action=edit&id='  .$item['id'].'" title="Edit"><img src="images/icons/edit.png" /></a>'; }
+            if ($canDeleteNews) { echo '<a href="index.php?page=admin&section=news&action=delete&id='.$item['id'].'" title="Delete" onclick="javascript: return (confirm(\'Are you sure you want to delete this item?\'));"><img src="images/icons/delete.png" /></a>'; }
             echo '</td>';
         }
         echo '</tr>';
@@ -229,7 +241,7 @@ elseif ($action == 'edit' || $action == 'add') {
                 else {
                     $text = 'Article successfully added!';
 
-                    if (!in_array('edit', $permissions[$role][$section])) {
+                    if (!$canEditNews) {
                         $text .= '<br />Please wait for an approval.';
                     }
 
@@ -239,18 +251,30 @@ elseif ($action == 'edit' || $action == 'add') {
 
         }
 
-        // if the action is add, and the user has successfully added the article,
-        // 
-        if ($action == 'add' && $_POST && !$errors && !in_array('edit', $permissions[$role][$section])) {
-            echo '<p>Add <a href="index.php?page=admin&section='.$section.'&action='.$action.'">another article</a>?</p>';
+        // if the action is add, and the user has successfully added the article
+        if ($action == 'add' && $_POST && !$errors) {
+
+            // if the user has no permission to edit news, simply show them "Add another article?" link
+            if (!$canEditNews) {
+                echo '<p>Add <a href="index.php?page=admin&section='.$section.'&action='.$action.'">another article</a>?</p>';
+            }
+
+            // if they do have permission to edit, load the data as if it is being edited from now on
+            // by faux setting action and news id (because redirect is not possible at this point)
+            else {
+                $news_id = $mysqli->insert_id;
+                $news    = getNewsById($news_id);
+                $action  = 'edit';
+            }
         }
 
-        // show the form only if the user has right to edit
-        else {
+        // show the form only if the action is add AND there were errors or no $_POST info
+        // OR if it the action is edit and the user has proper permissions to edit
+        if ((($action == 'add' && (!$_POST || $errors)) || ($action == 'edit' && $canEditNews))) {
             echo '<form method="post" action="index.php?page=admin&section='.$section.'&action='.$action.($news_id ? '&id='.$news_id : '').'" class="admin-form" enctype="multipart/form-data">
                       <h2>'.ucfirst($action).' article'.((@$news['active'] && @$news_id) ? '<a href="index.php?page=news&id='.$news_id.'" target="_blank" class="place-right" title="Preview"><img src="images/icons/preview.png" /></a>' : '').'</h2>';
 
-                if (in_array('edit', $permissions[$role][$section])) {
+                if ($canEditNews) {
                     echo '
                       <div class="row">
                           <label for="active">Visible</label>
@@ -264,7 +288,7 @@ elseif ($action == 'edit' || $action == 'add') {
                     echo '<input type="hidden" name="active" value="0" />';
                 }
 
-                if (in_array('edit', $permissions[$role][$section]) && @$news['author']) {
+                if ($canEditNews && @$news['author']) {
                     echo '<div class="row">
                               <label>Author</label>
                               <div class="field"><strong>'. @$news['author'] .'</strong></div>
@@ -355,7 +379,7 @@ elseif ($action == 'delete') {
 
     // if the user has permissions to see the users list,
     // generate a link to get them there
-    if (in_array('index', $permissions[$role][$section])) {
+    if ($canListNews) {
         $flashMsg .= '<br />Go back to <a href="index.php?page=admin&section='.$section.'&action=index">all news</a>.';
     }
 
